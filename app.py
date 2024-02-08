@@ -32,7 +32,7 @@ def generate_text():
     )
     if response.status_code == 200:
         res = response.json()[0]['generated_text']
-        return jsonify(extract_text_between_brackets(res))
+        return jsonify(res)
     
     else:
         return jsonify({"error": response.text}), response.status_code
