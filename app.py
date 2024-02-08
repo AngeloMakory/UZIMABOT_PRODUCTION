@@ -6,6 +6,21 @@ import os
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
+
+def extract_text_between_brackets(text):
+    # Define the regular expression pattern to match text between brackets and last full stop
+    pattern = r'\[SEP\](.*?)\.'
+
+    # Find all matches using the pattern
+    matches = re.findall(pattern, text, re.DOTALL)
+
+    # If there are matches, return the last match
+    if matches:
+        return matches[-1].strip()
+    else:
+        return None
+    
+
 @app.route('/generate-text', methods=['POST'])
 def generate_text():
     input_text = request.json.get('text')
@@ -15,7 +30,9 @@ def generate_text():
         json={"inputs": input_text, "parameters": {"max_length": 50}}
     )
     if response.status_code == 200:
-        return jsonify(response.json()[0]['generated_text'])
+        res = response.json()[0]['generated_text']
+        return jsonify(extract_text_between_brackets(res))
+    
     else:
         return jsonify({"error": response.text}), response.status_code
 
